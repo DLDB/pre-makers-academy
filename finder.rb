@@ -7,9 +7,13 @@
 # needs: a function to check whether the hidden number is higher or lower than the "guess" and reduces the range accordingly
 # needs: a hash to store the results - using the numbers of the range as keys and the number of div_guesses to reach each number as the value
 
-range_high = 100
+puts "This program is built to ascertain find the fastest method to find a hidden number in a range of numbers comparing using the golden ratio method (divide the range by 1.62) vs selecting the mid point of the range."
+puts "Enter highest integer in the range"
 
-range_low = 1
+range_high = gets.chomp.to_i
+
+puts "Enter lowest integer in the range"
+range_low = gets.chomp.to_i
 
 the_range = Array (range_low..range_high) 
 
@@ -22,10 +26,7 @@ end
 
 def gold_ratio(a)
 	len = a.length
-	a[(len-1) / 1.62]
-
-def is_correct(g, x)
-	g == x
+	a[((len-1) / 1.62).floor]
 end
 
 def is_higher(g, x)
@@ -38,8 +39,10 @@ end
 
 guess_count = 0
 
-div_guesses = Hash.new {} #this is where we will store the results 
+div_guesses = Hash.new {} #this will store the results when we equally split the range of possibilities
+gold_guesses = Hash.new {} #this will store the result when we split the range by golden ratio
 
+# this fills div_guesses 
 until hidden_number == range_high
 	guess = midpoint(the_range)
 	guess_count += 1
@@ -54,7 +57,31 @@ until hidden_number == range_high
 	end
 end
 
-div_guesses.each {|x, y| puts "Hidden number: #{x} Guesses: #{y}"}
+hidden_number = range_low #this resets the hidden number
+
+#this fills gold_guesses
+until hidden_number == range_high
+	guess = gold_ratio(the_range)
+	guess_count += 1
+	if is_higher(guess, hidden_number)
+		the_range.keep_if {|n| n <= guess}
+	elsif is_lower(guess, hidden_number)
+		the_range.keep_if {|n| n >= guess}
+	else gold_guesses[hidden_number] = guess_count
+		the_range = Array (range_low..range_high)
+		guess_count = 0
+		hidden_number += 1
+	end
+end
+
+div_total = div_guesses.values.inject {|a,b| a + b}
+div_worst = div_guesses.values.max
+puts "If you always guess the number in the middle of all the possibilities: Total guesses = #{div_total}, worst case = #{div_worst}"
+
+gold_total = gold_guesses.values.inject {|a,b| a + b}
+gold_worst = gold_guesses.values.max
+puts "If you use the golden ratio to make your guess: Total guesses = #{gold_total}, worst case = #{gold_worst}"
+
 
 
 
