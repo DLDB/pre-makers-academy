@@ -17,6 +17,8 @@ range_low = gets.chomp.to_i
 
 the_range = Array (range_low..range_high) 
 
+puts "The range right now is #{the_range}"
+
 hidden_number = range_low #this sets the number we have to find - maybe try to put this inside the hash, right from the start?
 
 def midpoint(a) #this makes a guess in the middle of the range of possibilities
@@ -43,14 +45,15 @@ div_guesses = Hash.new {} #this will store the results when we equally split the
 gold_guesses = Hash.new {} #this will store the result when we split the range by golden ratio
 
 # this fills div_guesses 
-until hidden_number == range_high
+until hidden_number > range_high
 	guess = midpoint(the_range)
 	guess_count += 1
 	if is_higher(guess, hidden_number)
 		the_range.keep_if {|n| n <= guess}
 	elsif is_lower(guess, hidden_number)
-		the_range.keep_if {|n| n >= guess}
-	else div_guesses[hidden_number] = guess_count
+		the_range.keep_if {|n| n > guess}
+	else 
+		div_guesses[hidden_number] = guess_count
 		the_range = Array (range_low..range_high)
 		guess_count = 0
 		hidden_number += 1
@@ -74,10 +77,12 @@ until hidden_number == range_high
 	end
 end
 
+puts "This is the array when /2: #{div_guesses}"
 div_total = div_guesses.values.inject {|a,b| a + b}
 div_worst = div_guesses.values.max
 puts "If you always guess the number in the middle of all the possibilities: Total guesses = #{div_total}, worst case = #{div_worst}"
 
+puts "This is the array when golden ration: #{div_guesses}"
 gold_total = gold_guesses.values.inject {|a,b| a + b}
 gold_worst = gold_guesses.values.max
 puts "If you use the golden ratio to make your guess: Total guesses = #{gold_total}, worst case = #{gold_worst}"
